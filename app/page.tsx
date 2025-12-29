@@ -1,65 +1,143 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+
+type Star = {
+  left: string;
+  top: string;
+  duration: number;
+};
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const [fireworks] = useState(() =>
+    Array.from({ length: 6 }).map(() => ({
+      left: `${10 + Math.random() * 80}vw`,
+      top: `${10 + Math.random() * 40}vh`,
+      size: 60 + Math.random() * 80,
+      delay: Math.random() * 4,
+    }))
+  );
+
+  const [stars] = useState<Star[]>(() =>
+    Array.from({ length: 40 }).map(() => ({
+      left: `${Math.random() * 100}vw`,
+      top: `${Math.random() * 100}vh`,
+      duration: 2 + Math.random() * 3,
+    }))
+  );
+
+  const [snowflakes] = useState(() =>
+    Array.from({ length: 35 }).map(() => ({
+      left: `${Math.random() * 100}vw`,
+      size: 1 + Math.random() * 3,
+      duration: 6 + Math.random() * 6,
+      delay: Math.random() * 5,
+    }))
+  );
+
+  if (!mounted) return null;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-[#050816] via-[#0b1026] to-[#1a1f4a]">
+      {/* ⭐ Stars */}
+      {stars.map((star, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 bg-white rounded-full opacity-80"
+          style={{ left: star.left, top: star.top }}
+          animate={{ opacity: [0.2, 1, 0.2] }}
+          transition={{
+            duration: star.duration,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      ))}
+
+      {/* ❄️ Snowfall */}
+      {snowflakes.map((flake, i) => (
+        <motion.div
+          key={i}
+          className="absolute top-0 bg-white rounded-full opacity-80"
+          style={{
+            left: flake.left,
+            width: flake.size,
+            height: flake.size,
+          }}
+          animate={{ y: "110vh" }}
+          transition={{
+            duration: flake.duration,
+            delay: flake.delay,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      ))}
+
+      {/* 🎆 Fireworks */}
+      {fireworks.map((fw, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border-2 border-yellow-300"
+          style={{
+            left: fw.left,
+            top: fw.top,
+            width: fw.size,
+            height: fw.size,
+          }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: [0, 1, 1.2], opacity: [0, 1, 0] }}
+          transition={{
+            duration: 2,
+            delay: fw.delay,
+            repeat: Infinity,
+            repeatDelay: 3,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+
+      {/* 🌙 Glowing Moon */}
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: [1, 1.05, 1], opacity: 1 }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-16 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-yellow-200 shadow-[0_0_80px_30px_rgba(255,255,200,0.6)]"
+      />
+
+      {/* 🎉 New Year Text */}
+      <motion.div
+        initial={{ opacity: 0, y: 60, scale: 0.8 }}
+        animate={{ opacity: 1, y: [0, -10, 0], scale: 1 }}
+        transition={{
+          delay: 2,
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute inset-0 flex flex-col items-center justify-center text-center z-10"
+      >
+        <h1 className="text-white font-extrabold text-5xl md:text-7xl drop-shadow-[0_0_25px_rgba(255,255,255,0.9)]">
+          Happy New Year
+        </h1>
+        <span className="mt-2 text-yellow-300 font-extrabold text-6xl md:text-8xl drop-shadow-[0_0_30px_rgba(255,215,0,0.9)]">
+          2026
+        </span>
+      </motion.div>
+      {/* 🏙️ Ground / Silhouette */}
+      <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#020617] to-transparent" />
+      <div className="absolute bottom-0 w-full h-20 bg-[#020617]" />
+    </main>
   );
 }
